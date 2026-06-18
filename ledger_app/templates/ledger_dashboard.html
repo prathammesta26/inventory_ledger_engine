@@ -1,0 +1,129 @@
+<b><strong><h1>Ledger Dashboard</h1></strong></b>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warehouse Processing Engine Console</title>
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen font-sans">
+
+    <nav class="bg-slate-800 border-b border-slate-700 px-8 py-4 flex justify-between items-center">
+        <div class="flex items-center space-x-3">
+            <span class="text-2xl">⚡</span>
+            <span class="text-xl font-bold tracking-tight text-white font-mono">StockSync Engine <span class="text-xs text-indigo-400 font-normal">v1.2</span></span>
+        </div>
+        <div class="flex items-center space-x-2">
+            <span class="h-2.5 w-2.5 rounded-full bg-emerald-500 animate-pulse"></span>
+            <span class="text-xs font-mono text-slate-400">Database Engine Pipeline Operational</span>
+        </div>
+    </nav>
+
+    <main class="max-w-7xl mx-auto px-6 py-8">
+        
+        <div class="mb-8">
+            <h1 class="text-3xl font-extrabold text-white tracking-tight">Ledger Sync & Processing Interface</h1>
+            <p class="text-slate-400 text-sm mt-1">Simulate high-volume inventory data streams and measure real-time SQLite ingestion latency.</p>
+        </div>
+
+        {% if messages %}
+            {% for message in messages %}
+                <div class="p-4 mb-6 rounded-lg font-medium text-sm border {% if 'success' in message.tags %} bg-emerald-950/50 border-emerald-800 text-emerald-400 {% else %} bg-rose-950/50 border-rose-800 text-rose-400 {% endif %}">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        {% endif %}
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            
+            <div class="bg-slate-800 border border-slate-700 p-6 rounded-xl shadow-xl h-fit">
+                <h2 class="text-lg font-semibold text-white mb-2">Simulate Raw Batch Payload</h2>
+                <p class="text-xs text-slate-400 mb-4">Input structural string formats must match: <code class="bg-slate-950 px-1.5 py-0.5 rounded text-indigo-300 font-mono">SKU,Product Name,Stock</code></p>
+                
+                <form method="POST" action="{% url 'process_upload' %}">
+                    {% csrf_token %}
+                    <textarea name="bulk_data" rows="8" class="w-full bg-slate-950 border border-slate-700 rounded-lg p-4 font-mono text-xs text-slate-300 focus:outline-none focus:border-indigo-500 transition-colors" placeholder="SKU,Product,Stock&#10;SKU-101,Sony Playstation 5,450&#10;SKU-102,Apple iPhone 15 Pro,1200&#10;SKU-103,Nintendo Switch OLED,890"></textarea>
+                    
+                    <button type="submit" class="mt-4 w-full bg-indigo-600 hover:bg-indigo-500 font-semibold py-3 px-4 rounded-lg text-sm tracking-wide shadow-lg shadow-indigo-600/10 cursor-pointer transition-all">
+                        Run Optimization Bulk Pipeline
+                    </button>
+                </form>
+            </div>
+
+            <div class="lg:col-span-2 space-y-8">
+                
+                <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+                    <div class="px-6 py-4 border-b border-slate-700 bg-slate-800/50">
+                        <h3 class="text-md font-bold text-white">Live Distributed Warehouse Status Inventory</h3>
+                    </div>
+                    <div class="max-h-64 overflow-y-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-900/40 text-slate-400 text-xs font-bold uppercase border-b border-slate-700 font-mono">
+                                <tr>
+                                    <th class="px-6 py-3">Tracking SKU</th>
+                                    <th class="px-6 py-3">Product Name Specifications</th>
+                                    <th class="px-6 py-3 text-right">In-Stock Metric</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700">
+                                {% for item in items %}
+                                <tr class="hover:bg-slate-750/30 transition-colors">
+                                    <td class="px-6 py-4 font-mono text-xs text-indigo-300 font-semibold">{{ item.sku }}</td>
+                                    <td class="px-6 py-4 text-slate-200">{{ item.product_name }}</td>
+                                    <td class="px-6 py-4 text-right font-mono font-bold text-emerald-400">{{ item.warehouse_stock }}</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="3" class="px-6 py-8 text-center text-slate-500 italic">No storage entries currently tracked. Populate text blocks via control terminal.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <div class="bg-slate-800 border border-slate-700 rounded-xl overflow-hidden shadow-xl">
+                    <div class="px-6 py-4 border-b border-slate-700 bg-slate-800/50">
+                        <h3 class="text-md font-bold text-white">Engine Performance Latency History</h3>
+                    </div>
+                    <div class="max-h-60 overflow-y-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-slate-900/40 text-slate-400 text-xs font-bold uppercase border-b border-slate-700 font-mono">
+                                <tr>
+                                    <th class="px-6 py-3">Target Ingested File</th>
+                                    <th class="px-6 py-3">Volumetric Row Size</th>
+                                    <th class="px-6 py-3">Engine Logic State</th>
+                                    <th class="px-6 py-3 text-right">Processing Latency</th>
+                                </tr>
+                            </thead>
+                            <tbody class="divide-y divide-slate-700">
+                                {% for log in logs %}
+                                <tr class="hover:bg-slate-750/30 text-xs">
+                                    <td class="px-6 py-3 font-mono text-slate-300">{{ log.filename }}</td>
+                                    <td class="px-6 py-3 text-slate-400">{{ log.rows_processed }} Actions Run</td>
+                                    <td class="px-6 py-3">
+                                        {% if "SUCCESS" in log.status %}
+                                            <span class="bg-emerald-950 text-emerald-400 border border-emerald-800 px-2 py-0.5 rounded text-[10px] font-bold font-mono">SUCCESS</span>
+                                        {% else %}
+                                            <span class="bg-rose-950 text-rose-400 border border-rose-800 px-2 py-0.5 rounded text-[10px] font-bold font-mono">CRITICAL ESCALATION</span>
+                                        {% endif %}
+                                    </td>
+                                    <td class="px-6 py-3 text-right font-mono text-indigo-400 font-semibold">{{ log.execution_time_ms }} ms</td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-slate-500 italic">Performance registry pipeline holds zero recorded logs.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </main>
+
+</body>
+</html>
